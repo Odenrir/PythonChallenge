@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import json
-from flask import Flask, request, redirect, jsonify, session
+from flask import Flask, request, jsonify, session, render_template
+from flask_socketio import SocketIO, send
 from services import user_db
 
 app = Flask(__name__)
 app.secret_key = 'jobsity'
+socketio = SocketIO(app)
+
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('chat.html')
 
 @app.route('/newuser', methods=['POST'])
 def new_user():
@@ -40,5 +47,11 @@ def logout():
                     'data': {'message': 'logout success'}})
 
 
+'''-----------------Socket events-------------------------'''
+@socketio.on('message')
+def handle_message(data):
+    print('received message: ' + str(data))
+
 if __name__ == "__main__":
-    app.run(port=8080, debug=True)
+    #app.run(port=8080, debug=True)
+    socketio.run(app, async_mode='eventlet')
