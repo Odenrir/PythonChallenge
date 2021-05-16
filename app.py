@@ -2,11 +2,10 @@
 # encoding: utf-8
 import json
 
-from flask import Flask, request, jsonify, session, render_template, redirect, url_for
-from flask_socketio import SocketIO
+from flask import Flask, request, jsonify, render_template, url_for
+from flask_socketio import SocketIO, send
 from flask_login import LoginManager, login_user, login_required, current_user
 
-from models.user import User
 from services import user_db
 
 app = Flask(__name__)
@@ -70,19 +69,31 @@ def logout():
 '''-----------------Socket events-------------------------'''
 
 
-@socketio.on('join')
+@socketio.on('connect')
 @login_required
 def join():
-    print(current_user.username + ' join the room')
+    msg = current_user.username + ' joined'
+    print(msg)
+    send(msg, broadcast=True)
+
+
+@socketio.on('disconnect')
+@login_required
+def join():
+    msg = current_user.username + ' leave'
+    print(msg)
+    send(msg, broadcast=True)
 
 
 @socketio.on('message')
 @login_required
 def handle_message(data):
-    print(current_user.username + ': ' + str(data))
+    msg = current_user.username + ': ' + str(data)
+    print(msg)
+    send(msg, broadcast=True)
 
 
 if __name__ == "__main__":
     # app.run(port=8080, debug=True)
-    #socketio.run(app, async_mode='eventlet')
-    socketio.run(app)
+    socketio.run(app, async_mode='eventlet')
+    #socketio.run(app)

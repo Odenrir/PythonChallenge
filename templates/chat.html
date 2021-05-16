@@ -9,14 +9,15 @@
 <body>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
-
-
             var socket = io();
-                    socket.on('connect', function() {
-                        socket.emit('join');
-                    });
+            socket.on('connect', function() {
+                socket.emit('join');
+            });
 
             socket.on('message', function(msg) {
+                if ($('#messages ul li').length >= 50) {
+                    $('#messages li:first-child').remove();
+                }
                 $('#messages').append('<li>' + msg + '</li>');
             });
 
