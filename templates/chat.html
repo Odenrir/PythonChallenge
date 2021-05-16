@@ -9,13 +9,16 @@
 <body>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
+            for(var i = 0; i < 50; i++) {
+                $('#messages').append('<li></li>');
+            }
             var socket = io();
             socket.on('connect', function() {
                 socket.emit('join');
             });
 
             socket.on('message', function(msg) {
-                if ($('#messages ul li').length >= 50) {
+                if ($('#messages li').length >= 50) {
                     $('#messages li:first-child').remove();
                 }
                 $('#messages').append('<li>' + msg + '</li>');
@@ -24,6 +27,7 @@
             $('#send').on('click',function (){
                 var message = $('#message').val();
                 socket.send(message);
+                $('#message').val('');
             });
 
         });

@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, render_template, url_for
 from flask_socketio import SocketIO, send
 from flask_login import LoginManager, login_user, login_required, current_user
 
-from services import user_db
+from services import user_db, rabbitmq
 
 app = Flask(__name__)
 app.secret_key = 'jobsity'
@@ -95,5 +95,6 @@ def handle_message(data):
 
 if __name__ == "__main__":
     # app.run(port=8080, debug=True)
+    rabbitmq.consume_message()
     socketio.run(app, async_mode='eventlet')
     #socketio.run(app)
