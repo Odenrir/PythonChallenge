@@ -14,6 +14,7 @@ socketio = SocketIO(app)
 def index():
     return render_template('chat.html')
 
+
 @app.route('/newuser', methods=['POST'])
 def new_user():
     info = json.loads(request.data)
@@ -24,6 +25,7 @@ def new_user():
         return jsonify({'status': 201, 'message': 'User created'})
     else:
         return jsonify({'status': 409, 'reason': 'User already exists'})
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -48,10 +50,25 @@ def logout():
 
 
 '''-----------------Socket events-------------------------'''
+
+
+@socketio.on('join')
+def join():
+    if 'user' in session:
+        print(session['user']['username'] + ' join the room')
+    else:
+        print('anonymous join the room')
+
+
 @socketio.on('message')
 def handle_message(data):
-    print('received message: ' + str(data))
+    if 'user' in session:
+        print(session['user']['username'] + ': ' + str(data))
+    else:
+        print('anonymous : ' + str(data))
+
 
 if __name__ == "__main__":
-    #app.run(port=8080, debug=True)
-    socketio.run(app, async_mode='eventlet')
+    # app.run(port=8080, debug=True)
+    #socketio.run(app, async_mode='eventlet')
+    socketio.run(app)

@@ -7,7 +7,7 @@
     <script type="text/javascript" charset="utf-8">
         var socket = io();
         socket.on('connect', function() {
-            socket.emit('message', {data: 'I\'m connected!'});
+            socket.emit('join');
         });
     </script>
 </head>

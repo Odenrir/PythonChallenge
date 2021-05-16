@@ -4,7 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models.user import User
 
 
-
 def login(username, password):
     database = db.getDb(os.getcwd() + '/db/users.json')
     query = database.getBy({'username': username})
@@ -28,4 +27,3 @@ def create_user(username, password):
         return User(user_data['username'])
     else:
         return None
-
