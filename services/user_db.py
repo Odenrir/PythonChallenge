@@ -12,9 +12,18 @@ def login(username, password):
     else:
         user_data = query[0]
         if check_password_hash(user_data['password'], password):
-            return User(user_data['username'])
+            return User(user_data['username'], user_data["password"])
         else:
             return None
+
+def get_user(username):
+    database = db.getDb(os.getcwd() + '/db/users.json')
+    query = database.getBy({'username': username})
+    if not query:
+        return None
+    else:
+        user_data = query[0]
+        return User(user_data['username'], user_data["password"])
 
 
 def create_user(username, password):

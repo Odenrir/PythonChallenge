@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login chat</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./css/style.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<script>
+    $(document).ready(function() {
+        $('#form').submit(function (e){
+            e.preventDefault();
+            var password = $('#password').val();
+            var user = $('#username').val();
+            var jsonPost = {
+                "username": user,
+                "password": password
+            };
+            console.log(jsonPost);
+
+            if (user == '' || password == '') {
+                alert('Please fill all the fields')
+            }
+            $.ajax({
+                url: "http://localhost:5000/login",
+                contentType: 'application/json',
+                type: "POST",
+                crossDomain: true,
+                data: JSON.stringify(jsonPost),
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    window.location.href = data.url;
+                },
+                error: function (xhr, status) {
+                    console.log(xhr)
+                    alert("Response Error");
+                }
+
+            });
+        });
+    });
+</script>
+<div class="contain">
+        <div class="main">
+            <form id="form" action="http://localhost:5000/login" method="post">
+                <table>
+                    <tr>
+                        <th style="padding:15px 15px 15px 15px;">
+                            <label>User:</label>
+                        </th>
+                        <th style="padding:15px 15px 15px 15px;">
+                            <input type="text" name="username" id="username" required>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th style="padding:15px 15px 15px 15px;">
+                            <label>Password:</label>
+                        </th>
+                        <th>
+                            <input type="password" name="password" id="password" required>
+                        </th>
+
+                    </tr>
+                    <tr>
+                        <th style="padding:15px 15px 15px 15px;">
+                            <button type="submit" name="access" id="access">Lets chat</button>
+                        </th>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

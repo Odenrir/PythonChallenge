@@ -1,17 +1,33 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import json
-from flask import Flask, request, jsonify, session, render_template
-from flask_socketio import SocketIO, send
+
+from flask import Flask, request, jsonify, session, render_template, redirect, url_for
+from flask_socketio import SocketIO
+from flask_login import LoginManager, login_user, login_required, current_user
+
+from models.user import User
 from services import user_db
 
 app = Flask(__name__)
 app.secret_key = 'jobsity'
 socketio = SocketIO(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = ''
 
+@login_manager.user_loader
+def load_user(username):
+    return user_db.get_user(username)
 
 @app.route('/', methods=['GET'])
 def index():
+    return render_template('login.html')
+
+
+@app.route('/chat', methods=['GET'])
+@login_required
+def chat():
     return render_template('chat.html')
 
 
@@ -34,17 +50,19 @@ def login():
     password = info.get('password', '')
     user = user_db.login(username, password)
     if user:
-        session['user'] = user.to_json()
-        return jsonify(user.to_json())
+        login_user(user)
+        result = {'url': url_for('chat')}
+        return jsonify(result)
     else:
         return jsonify({"status": 401,
                         "reason": "Username or Password Error"})
 
 
 @app.route('/logout', methods=['POST'])
+@login_required
 def logout():
-    if 'user' in session:
-        session.pop('user', None)
+    user = current_user
+    user.authenticated = False
     return jsonify({'result': 200,
                     'data': {'message': 'logout success'}})
 
@@ -53,19 +71,15 @@ def logout():
 
 
 @socketio.on('join')
+@login_required
 def join():
-    if 'user' in session:
-        print(session['user']['username'] + ' join the room')
-    else:
-        print('anonymous join the room')
+    print(current_user.username + ' join the room')
 
 
 @socketio.on('message')
+@login_required
 def handle_message(data):
-    if 'user' in session:
-        print(session['user']['username'] + ': ' + str(data))
-    else:
-        print('anonymous : ' + str(data))
+    print(current_user.username + ': ' + str(data))
 
 
 if __name__ == "__main__":
