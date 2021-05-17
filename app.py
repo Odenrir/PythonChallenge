@@ -78,7 +78,7 @@ def logout():
 '''-----------------Socket events-------------------------'''
 
 
-@socketio.on('connect')
+@socketio.on('join')
 @login_required
 def connect():
     msg = current_user.username + ' joined'
@@ -106,6 +106,4 @@ def handle_message(data):
 
 
 if __name__ == "__main__":
-    # app.run(port=8080, debug=True)
-    socketio.run(app, async_mode='eventlet')
-    # socketio.run(app)
+    socketio.run(app, host='0.0.0.0')

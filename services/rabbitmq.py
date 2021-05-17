@@ -2,7 +2,7 @@ import pika
 
 
 def publish_message(msg):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
     channel = connection.channel()
     channel.queue_declare(queue='bot', durable=True)
     channel.basic_publish(exchange='', routing_key='bot', body=msg)
@@ -11,8 +11,9 @@ def publish_message(msg):
 
 
 def consume_message(socketio):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='rabbitmq'))
     channel = connection.channel()
+    channel.queue_declare(queue='chat', durable=True)
 
     def callback(ch, method, properties, body):
         result = body.decode('utf-8')
