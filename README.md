@@ -7,7 +7,7 @@ Jobsity Challenge - Argenis Aroche
 
 # How to run?
 - docker-compose up
-- Go to http://localhost:5000 and login it with any of the follow users:
+- Go to http://localhost:5000 and log in it with any of the follow users:
 ```json
 [
   { "username": "Argenis", "password": "abcd1234" },
@@ -15,7 +15,7 @@ Jobsity Challenge - Argenis Aroche
 ]
 ```
 
-- Create an user
+- Create a user
 ```bash
 curl --header "Content-Type: application/json" --request POST --data '{"username":"user1","password":"abcd"}' http://localhost:5000/newuser
 ```
