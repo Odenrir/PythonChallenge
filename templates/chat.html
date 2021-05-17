@@ -13,7 +13,7 @@
                 $('#messages').append('<li></li>');
             }
             var socket = io();
-            socket.on('join', function() {
+            socket.on('connect', function() {
                 socket.emit('join');
             });
 

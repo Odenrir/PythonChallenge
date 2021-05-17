@@ -15,4 +15,4 @@ RUN pip3 install -r requirements.txt
 EXPOSE 9999
 
 #Run the command
-CMD ["python3", "bot.py"]
+CMD ["python3","bot.py"]

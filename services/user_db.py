@@ -16,6 +16,7 @@ def login(username, password):
         else:
             return None
 
+
 def get_user(username):
     database = db.getDb(os.getcwd() + '/db/users.json')
     query = database.getBy({'username': username})
@@ -33,6 +34,6 @@ def create_user(username, password):
         user_id = database.add({'username': username, 'password': password_hash})
         query = database.getBy({'id': user_id})
         user_data = query[0]
-        return User(user_data['username'])
+        return User(user_data['username'], user_data["password"])
     else:
         return None

@@ -78,11 +78,10 @@ def logout():
 '''-----------------Socket events-------------------------'''
 
 
-@socketio.on('join')
+@socketio.on('connect')
 @login_required
 def connect():
     msg = current_user.username + ' joined'
-    print(msg)
     send(msg, broadcast=True)
 
 
@@ -90,7 +89,6 @@ def connect():
 @login_required
 def disconnect():
     msg = current_user.username + ' leave'
-    print(msg)
     send(msg, broadcast=True)
 
 
@@ -101,7 +99,6 @@ def handle_message(data):
         rabbitmq.publish_message(data)
     else:
         msg = current_user.username + ': ' + str(data)
-        print(msg)
         send(msg, broadcast=True)
 
 

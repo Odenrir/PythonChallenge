@@ -8,6 +8,10 @@ services:
       - "5000:5000"
     depends_on:
       - rabbitmq
+    entrypoint:
+      - flask
+      - run
+      - --host=0.0.0.0
   bot:
     build: ./bot/
     restart: on-failure
