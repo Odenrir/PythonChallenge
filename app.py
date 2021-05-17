@@ -1,23 +1,32 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import json
-
+import threading
 from flask import Flask, request, jsonify, render_template, url_for
 from flask_socketio import SocketIO, send
 from flask_login import LoginManager, login_user, login_required, current_user
-
 from services import user_db, rabbitmq
 
 app = Flask(__name__)
 app.secret_key = 'jobsity'
+
 socketio = SocketIO(app)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = ''
 
+
 @login_manager.user_loader
 def load_user(username):
     return user_db.get_user(username)
+
+
+@app.before_first_request
+def activate_job():
+    thread = threading.Thread(target=rabbitmq.consume_message, args=(socketio,))
+    thread.start()
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -71,7 +80,7 @@ def logout():
 
 @socketio.on('connect')
 @login_required
-def join():
+def connect():
     msg = current_user.username + ' joined'
     print(msg)
     send(msg, broadcast=True)
@@ -79,7 +88,7 @@ def join():
 
 @socketio.on('disconnect')
 @login_required
-def join():
+def disconnect():
     msg = current_user.username + ' leave'
     print(msg)
     send(msg, broadcast=True)
@@ -88,13 +97,15 @@ def join():
 @socketio.on('message')
 @login_required
 def handle_message(data):
-    msg = current_user.username + ': ' + str(data)
-    print(msg)
-    send(msg, broadcast=True)
+    if data.startswith('/'):
+        rabbitmq.publish_message(data)
+    else:
+        msg = current_user.username + ': ' + str(data)
+        print(msg)
+        send(msg, broadcast=True)
 
 
 if __name__ == "__main__":
     # app.run(port=8080, debug=True)
-    rabbitmq.consume_message()
     socketio.run(app, async_mode='eventlet')
-    #socketio.run(app)
+    # socketio.run(app)

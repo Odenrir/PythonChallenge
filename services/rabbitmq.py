@@ -10,13 +10,14 @@ def publish_message(msg):
     connection.close()
 
 
-def consume_message():
+def consume_message(socketio):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
 
     def callback(ch, method, properties, body):
-        print(" [x] Received %r" % body)
+        result = body.decode('utf-8')
+        socketio.send(result, broadcast=True)
 
-    print('Star consuming messages')
+    print('Start consuming messages')
     channel.basic_consume(queue='chat', on_message_callback=callback, auto_ack=True)
     channel.start_consuming()
