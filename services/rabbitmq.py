@@ -4,7 +4,7 @@ import pika
 def publish_message(msg):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
-    channel.queue_declare(queue='bot')
+    channel.queue_declare(queue='bot', durable=True)
     channel.basic_publish(exchange='', routing_key='bot', body=msg)
     print('Sent ' + msg + ' to StockBot')
     connection.close()
