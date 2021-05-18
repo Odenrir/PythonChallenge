@@ -8,7 +8,6 @@ from flask import Flask, request, jsonify, render_template, url_for
 from flask_socketio import SocketIO, send
 from flask_cors import CORS, cross_origin
 from flask_login import LoginManager, login_user, login_required, current_user
-from datetime import datetime
 from services import user_db, messages_db, rabbitmq
 
 app = Flask(__name__)
