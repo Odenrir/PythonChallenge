@@ -3,21 +3,31 @@
 
 import json
 import threading
+
 from flask import Flask, request, jsonify, render_template, url_for
 from flask_socketio import SocketIO, send
+from flask_cors import CORS, cross_origin
 from flask_login import LoginManager, login_user, login_required, current_user
 from datetime import datetime
 from services import user_db, messages_db, rabbitmq
 
-
 app = Flask(__name__)
 app.secret_key = 'jobsity'
 
+CORS(app)
 socketio = SocketIO(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = ''
+
+app.after_request
+
+
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 @login_manager.user_loader
@@ -32,17 +42,20 @@ def activate_job():
 
 
 @app.route('/', methods=['GET'])
+@cross_origin(origin='*')
 def index():
     return render_template('login.html')
 
 
 @app.route('/chat', methods=['GET'])
+@cross_origin(origin='*')
 @login_required
 def chat():
     return render_template('chat.html')
 
 
 @app.route('/newuser', methods=['POST'])
+@cross_origin(origin='*')
 def new_user():
     info = json.loads(request.data)
     username = info.get('username', 'guest')
@@ -55,6 +68,7 @@ def new_user():
 
 
 @app.route('/login', methods=['POST'])
+@cross_origin(origin='*')
 def login():
     info = json.loads(request.data)
     username = info.get('username', 'guest')
@@ -70,6 +84,7 @@ def login():
 
 
 @app.route('/logout', methods=['POST'])
+@cross_origin(origin='*')
 @login_required
 def logout():
     user = current_user
@@ -84,8 +99,8 @@ def logout():
 @socketio.on('connect')
 @login_required
 def connect():
-    msg = current_user.username + ' joined'
-    messages_db.save_msg(current_user.username, 'joined')
+    msg = current_user.username + ' joined the chat'
+    messages_db.save_msg(current_user.username, 'joined chat')
     send(msg, broadcast=True)
 
 
@@ -93,7 +108,7 @@ def connect():
 @login_required
 def disconnect():
     msg = current_user.username + ' leave'
-    messages_db.save_msg(current_user.username, 'leave')
+    messages_db.save_msg(current_user.username, 'leave the chat')
     send(msg, broadcast=True)
 
 
