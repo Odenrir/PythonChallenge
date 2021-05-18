@@ -12,17 +12,17 @@
             for(var i = 0; i < 50; i++) {
                 $('#messages').append('<li></li>');
             }
-            var socket = io();
+            const socket = io();
             socket.on('connect', function() {
             });
             socket.on('disconnect', function() {
             });
 
             socket.on('message', function(msg) {
-                if ($('#messages li').length >= 50) {
-                    $('#messages li:first-child').remove();
-                }
-                $('#messages').append('<li>' + msg + '</li>');
+                const dateString = new Date().toLocaleTimeString();
+                const message = '[' + dateString + '] - ' + msg;
+                $('#messages').append('<li>' + message + '</li>');
+                $('#messages li:first-child').remove();
             });
 
             $('#send').on('click',function (){

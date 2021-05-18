@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # encoding: utf-8
+
 import json
 import threading
 from flask import Flask, request, jsonify, render_template, url_for
 from flask_socketio import SocketIO, send
 from flask_login import LoginManager, login_user, login_required, current_user
-from services import user_db, rabbitmq
+from datetime import datetime
+from services import user_db, messages_db, rabbitmq
+
 
 app = Flask(__name__)
 app.secret_key = 'jobsity'
@@ -82,6 +85,7 @@ def logout():
 @login_required
 def connect():
     msg = current_user.username + ' joined'
+    messages_db.save_msg(current_user.username, 'joined')
     send(msg, broadcast=True)
 
 
@@ -89,6 +93,7 @@ def connect():
 @login_required
 def disconnect():
     msg = current_user.username + ' leave'
+    messages_db.save_msg(current_user.username, 'leave')
     send(msg, broadcast=True)
 
 
@@ -99,6 +104,7 @@ def handle_message(data):
         rabbitmq.publish_message(data)
     else:
         msg = current_user.username + ': ' + str(data)
+        messages_db.save_msg(current_user.username, str(data))
         send(msg, broadcast=True)
 
 

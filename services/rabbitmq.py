@@ -1,4 +1,5 @@
 import pika
+from services import messages_db
 
 
 def publish_message(msg):
@@ -15,7 +16,8 @@ def consume_message(socketio):
     channel.queue_declare(queue='chat', durable=True)
 
     def callback(ch, method, properties, body):
-        result = 'bot: ' + body.decode('utf-8')
+        result = 'Bot: ' + body.decode('utf-8')
+        messages_db.save_msg('bot', body.decode('utf-8'))
         socketio.send(result, broadcast=True)
 
     channel.basic_consume(queue='chat', on_message_callback=callback, auto_ack=True)

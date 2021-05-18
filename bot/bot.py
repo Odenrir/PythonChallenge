@@ -5,20 +5,23 @@ from io import StringIO
 
 
 def parse_command(command):
-    if command.lower().startswith('/stock='):
-        command_split = command.split('=')
-        result = command_split[1].strip().lower()
-        url = 'https://stooq.com/q/l/?s=' + result + '&f=sd2t2ohlcv&h&e=csv'
-        response = requests.get(url)
-        cr = csv.DictReader(StringIO(response.text))
-        list_dict = []
-        for row in cr:
-            list_dict.append(row)
-        stock = dict(list_dict[0])
-        bot_message = stock['Symbol'] + ' quote is $' + stock['Close'] + ' per share.'
-        return bot_message
-    else:
-        return 'command not found'
+    try:
+        if command.lower().startswith('/stock='):
+            command_split = command.split('=')
+            result = command_split[1].strip().lower()
+            url = 'https://stooq.com/q/l/?s=' + result + '&f=sd2t2ohlcv&h&e=csv'
+            response = requests.get(url)
+            cr = csv.DictReader(StringIO(response.text))
+            list_dict = []
+            for row in cr:
+                list_dict.append(row)
+            stock = dict(list_dict[0])
+            bot_message = stock['Symbol'] + ' quote is $' + stock['Close'] + ' per share.'
+            return bot_message
+        else:
+            return 'Command not found'
+    except:
+        return 'A problem occurred when I try to bring your data'
 
 
 def publish_message(msg):
